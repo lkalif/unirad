@@ -47,6 +47,7 @@
      <Compile Include="Assets\Core\GridManager.cs" />
      <Compile Include="Assets\Core\Logger.cs" />
      <Compile Include="Assets\Core\LoginOptions.cs" />
+     <Compile Include="Assets\Core\Loom.cs" />
      <Compile Include="Assets\GUI\GUIBase.cs" />
      <Compile Include="Assets\GUI\LoginScreen.cs" />
      <Compile Include="Assets\Program.cs" />
