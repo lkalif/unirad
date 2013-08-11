@@ -10,7 +10,7 @@ public class LoginScreen : MonoBehaviour
     Program Instance;
     Texture2D splash;
     float panelHeightTarget = 150f;
-    float animDampenig = 8f;
+    float animTime = 2f;
     float panelHeight = 0f;
     bool opening = true;
     bool closing;
@@ -46,7 +46,7 @@ public class LoginScreen : MonoBehaviour
 
         if (opening)
         {
-            panelHeight = Mathf.Lerp(panelHeight, panelHeightTarget, animDampenig * Time.deltaTime);
+            panelHeight = Mathf.Lerp(panelHeight, panelHeightTarget, Time.deltaTime * 10 / animTime);
             if (panelHeightTarget - panelHeight < 0.5f)
             {
                 opening = false;
@@ -56,7 +56,7 @@ public class LoginScreen : MonoBehaviour
 
         if (closing)
         {
-            panelHeight = Mathf.Lerp(panelHeight, 0f, animDampenig * Time.deltaTime);
+            panelHeight = Mathf.Lerp(panelHeight, 0f, Time.deltaTime * 10 / animTime);
             if (panelHeight < 0.5f)
             {
                 closing = false;
@@ -95,10 +95,8 @@ public class LoginScreen : MonoBehaviour
                 }
                 else
                 {
-                    bool res = GUILayout.Button((failed ? "Retry" : "Login") + " " + counter);
-                    if (res)
+                    if (GUILayout.Button(failed ? "Retry" : "Login"))
                     {
-                        Debug.Log("Clicked");
                         Instance.BeginLogin();
                         logingIn = true;
                         closing = true;
@@ -132,8 +130,7 @@ public class LoginScreen : MonoBehaviour
                 GUILayout.Space(10f);
                 GUILayout.Label("Password");
                 password = GUILayout.PasswordField(password, '*');
-                rememberPassword = GUILayout.Toggle(rememberPassword, "Remember password");
-                GUILayout.Label("Login Location");
+                GUILayout.Label("Login Location\nFoo");
                 GUILayout.Button("My Last Location");
             }
             GUILayout.EndVertical();

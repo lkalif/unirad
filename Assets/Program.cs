@@ -36,21 +36,22 @@ public class Program : MonoBehaviour
         }
     }
 
-    [System.NonSerialized]
+    [NonSerialized]
     public OM.LoginProgressEventArgs LoginStatus = new OM.LoginProgressEventArgs(OM.LoginStatus.None, string.Empty, string.Empty);
-    LoginScreen login;
+    LoginScreen login = null;
     OM.LoginStatus lastLoginStatus = OM.LoginStatus.None;
-    
+    State currentState;
+
     void Start()
     {
         Logger.Init();
-        Loom.Initialize();
+        Loom.Initialize(gameObject);
 
         client = new OM.GridClient();
         InitializeLoggingAndConfig();
         InitializeClient(client);
-        login = (LoginScreen)GetComponent<LoginScreen>();
-        login.Visible = true;
+
+        currentState = State.Login;
     }
 
     void OnApplicationQuit()
@@ -62,13 +63,50 @@ public class Program : MonoBehaviour
         }
     }
 
+    enum State
+    {
+        Login,
+        LoggedIn,
+        Running
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if (lastLoginStatus != LoginStatus.Status)
+        switch (currentState)
         {
-            lastLoginStatus = this.LoginStatus.Status;
-            Debug.Log("Login status changed to: " + lastLoginStatus.ToString() + " " + LoginStatus.Message);
+            case State.Login:
+                {
+                    if (login == null)
+                    {
+                        login = gameObject.AddComponent<LoginScreen>();
+                        login.Visible = true;
+                    }
+
+                    if (lastLoginStatus != LoginStatus.Status)
+                    {
+                        lastLoginStatus = this.LoginStatus.Status;
+                        Debug.Log("Login status changed to: " + lastLoginStatus.ToString() + " " + LoginStatus.Message);
+                    }
+
+                    if (lastLoginStatus == OM.LoginStatus.Success)
+                    {
+                        currentState = State.LoggedIn;
+                    }
+                }
+                break;
+
+            case State.LoggedIn:
+                {
+                    Destroy(login);
+                    currentState = State.Running;
+                }
+                break;
+
+            case State.Running:
+                {
+                }
+                break;
         }
     }
 
@@ -76,7 +114,7 @@ public class Program : MonoBehaviour
     {
         LoginStatus = new OM.LoginProgressEventArgs(OM.LoginStatus.None, "Logging in...", "");
         string username = login.username;
-        
+
         string[] parts = System.Text.RegularExpressions.Regex.Split(username.Trim(), @"[. ]+");
         LoginOptions LoginOptions = new LoginOptions();
 
@@ -256,7 +294,6 @@ public class Program : MonoBehaviour
         try
         {
             userDir = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), AppName);
-            Debug.Log(userDir);
             if (!Directory.Exists(userDir))
             {
                 Directory.CreateDirectory(userDir);
