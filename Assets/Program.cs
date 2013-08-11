@@ -40,10 +40,12 @@ public class Program : MonoBehaviour
     public OM.LoginProgressEventArgs LoginStatus = new OM.LoginProgressEventArgs(OM.LoginStatus.None, string.Empty, string.Empty);
     LoginScreen login;
     OM.LoginStatus lastLoginStatus = OM.LoginStatus.None;
-
+    
     void Start()
     {
         Logger.Init();
+        Loom.Initialize();
+
         client = new OM.GridClient();
         InitializeLoggingAndConfig();
         InitializeClient(client);

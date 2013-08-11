@@ -27,7 +27,7 @@ public class Loom : MonoBehaviour
 	
 	static bool initialized;
 	
-	static void Initialize()
+	public static void Initialize()
 	{
 		if (!initialized)
 		{
