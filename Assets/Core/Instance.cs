@@ -4,7 +4,7 @@ using System.Collections;
 using OM = OpenMetaverse;
 using System.IO;
 
-public class Program : MonoBehaviour
+public class Instance : MonoBehaviour
 {
     [System.NonSerialized]
     public static readonly string AppName = "Radunity";

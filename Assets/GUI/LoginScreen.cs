@@ -7,7 +7,7 @@ public class LoginScreen : MonoBehaviour
 {
     [System.NonSerialized]
     public bool Visible;
-    Program Instance;
+    Instance Instance;
     Texture2D splash;
     float panelHeightTarget = 150f;
     float animTime = 2f;
@@ -28,7 +28,7 @@ public class LoginScreen : MonoBehaviour
 
     void Start()
     {
-        Instance = (Program)GetComponent<Program>();
+        Instance = (Instance)GetComponent<Instance>();
         splash = (Texture2D)Resources.Load("radegast-main screen2");
     }
 
@@ -130,7 +130,8 @@ public class LoginScreen : MonoBehaviour
                 GUILayout.Space(10f);
                 GUILayout.Label("Password");
                 password = GUILayout.PasswordField(password, '*');
-                GUILayout.Label("Login Location\nFoo");
+                GUILayout.Space(22f);
+                GUILayout.Label("Login Location");
                 GUILayout.Button("My Last Location");
             }
             GUILayout.EndVertical();

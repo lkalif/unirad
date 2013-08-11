@@ -45,12 +45,13 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Core\GridManager.cs" />
+     <Compile Include="Assets\Core\Instance.cs" />
      <Compile Include="Assets\Core\Logger.cs" />
      <Compile Include="Assets\Core\LoginOptions.cs" />
      <Compile Include="Assets\Core\Loom.cs" />
      <Compile Include="Assets\GUI\GUIBase.cs" />
      <Compile Include="Assets\GUI\LoginScreen.cs" />
-     <Compile Include="Assets\Program.cs" />
+     <Compile Include="Assets\Main.cs" />
  <Reference Include="log4net">
  <HintPath>Assets\Assemblies\log4net.dll</HintPath>
  </Reference>
