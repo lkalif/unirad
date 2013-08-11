@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using OM = OpenMetaverse;
 
 public class LoginScreen : MonoBehaviour
 {
-
+    [System.NonSerialized]
     public bool Visible;
-
+    Program Instance;
     Texture2D splash;
     float panelHeightTarget = 150f;
     float animDampenig = 8f;
@@ -14,18 +15,35 @@ public class LoginScreen : MonoBehaviour
     bool opening = true;
     bool closing;
 
-    string username = string.Empty;
-    string password = string.Empty;
-    bool rememberPassword;
-    bool logingIn;
+    [NonSerialized]
+    public string username = string.Empty;
+    [NonSerialized]
+    public string password = string.Empty;
+    [NonSerialized]
+    public bool rememberPassword;
+    [NonSerialized]
+    public bool logingIn;
+
+    bool failed;
 
     void Start()
     {
+        Instance = (Program)GetComponent<Program>();
         splash = (Texture2D)Resources.Load("radegast-main screen2");
     }
 
     void Update()
     {
+        if (!Visible) return;
+
+        if (Instance.LoginStatus.Status == OM.LoginStatus.Failed)
+        {
+            closing = false;
+            opening = true;
+            logingIn = false;
+            failed = true;
+        }
+
         if (opening)
         {
             panelHeight = Mathf.Lerp(panelHeight, panelHeightTarget, animDampenig * Time.deltaTime);
@@ -43,10 +61,11 @@ public class LoginScreen : MonoBehaviour
             {
                 closing = false;
                 panelHeight = 0f;
-                opening = true;
             }
         }
     }
+
+    int counter;
 
     void OnGUI()
     {
@@ -71,15 +90,19 @@ public class LoginScreen : MonoBehaviour
                 {
                     if (GUILayout.Button("Login in..."))
                     {
-                        logingIn = false;
+                        //logingIn = false;
                     }
                 }
                 else
                 {
-                    if (GUILayout.Button("Login"))
+                    bool res = GUILayout.Button((failed ? "Retry" : "Login") + " " + counter);
+                    if (res)
                     {
+                        Debug.Log("Clicked");
+                        Instance.BeginLogin();
                         logingIn = true;
                         closing = true;
+                        counter++;
                     }
                 }
             }

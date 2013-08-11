@@ -44,11 +44,20 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Core\GridManager.cs" />
+     <Compile Include="Assets\Core\Logger.cs" />
+     <Compile Include="Assets\Core\LoginOptions.cs" />
      <Compile Include="Assets\GUI\GUIBase.cs" />
      <Compile Include="Assets\GUI\LoginScreen.cs" />
      <Compile Include="Assets\Program.cs" />
- <Reference Include="XMLRPC">
- <HintPath>Assets\Assemblies\XMLRPC.dll</HintPath>
+ <Reference Include="log4net">
+ <HintPath>Assets\Assemblies\log4net.dll</HintPath>
+ </Reference>
+ <Reference Include="OpenMetaverse">
+ <HintPath>Assets\Assemblies\OpenMetaverse.dll</HintPath>
+ </Reference>
+ <Reference Include="OpenMetaverse.Rendering.Meshmerizer">
+ <HintPath>Assets\Assemblies\OpenMetaverse.Rendering.Meshmerizer.dll</HintPath>
  </Reference>
  <Reference Include="OpenMetaverse.StructuredData">
  <HintPath>Assets\Assemblies\OpenMetaverse.StructuredData.dll</HintPath>
@@ -59,17 +68,11 @@
  <Reference Include="PrimMesher">
  <HintPath>Assets\Assemblies\PrimMesher.dll</HintPath>
  </Reference>
- <Reference Include="log4net">
- <HintPath>Assets\Assemblies\log4net.dll</HintPath>
- </Reference>
- <Reference Include="OpenMetaverse">
- <HintPath>Assets\Assemblies\OpenMetaverse.dll</HintPath>
+ <Reference Include="XMLRPC">
+ <HintPath>Assets\Assemblies\XMLRPC.dll</HintPath>
  </Reference>
  <Reference Include="zlib.net">
  <HintPath>Assets\Assemblies\zlib.net.dll</HintPath>
- </Reference>
- <Reference Include="OpenMetaverse.Rendering.Meshmerizer">
- <HintPath>Assets\Assemblies\OpenMetaverse.Rendering.Meshmerizer.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
