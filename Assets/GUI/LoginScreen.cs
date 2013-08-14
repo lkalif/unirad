@@ -14,11 +14,12 @@ public class LoginScreen : MonoBehaviour
     float panelHeight = 0f;
     bool opening = true;
     bool closing;
+    bool showStatus;
 
     [NonSerialized]
-    public string username = string.Empty;
+    public string username = "Tester Anton";
     [NonSerialized]
-    public string password = string.Empty;
+    public string password = "tester";
     [NonSerialized]
     public bool rememberPassword;
     [NonSerialized]
@@ -42,6 +43,7 @@ public class LoginScreen : MonoBehaviour
             opening = true;
             logingIn = false;
             failed = true;
+            showStatus = true;
         }
 
         if (opening)
@@ -100,6 +102,7 @@ public class LoginScreen : MonoBehaviour
                         Instance.BeginLogin();
                         logingIn = true;
                         closing = true;
+                        showStatus = true;
                         counter++;
                     }
                 }
@@ -137,6 +140,38 @@ public class LoginScreen : MonoBehaviour
             GUILayout.EndVertical();
         }
         GUILayout.EndArea();
+
+        if (showStatus)
+        {
+            float statusWidth = 300f;
+            float statusHeight = 100f;
+
+            Rect statusRect = new Rect(
+                (Screen.width - statusWidth) / 2f,
+                (Screen.height - statusHeight) / 2f,
+                statusWidth,
+                statusHeight);
+
+            GUIBase.DrawPanel(new Rect(statusRect.xMin - 5f, statusRect.yMin, statusWidth + 2 * 5f, statusHeight + 2 * 5f));
+            GUILayout.BeginArea(statusRect);
+            {
+                var style = new GUIStyle();
+                if (Instance.LoginStatus.Status == OM.LoginStatus.Failed)
+                {
+                    style.normal.textColor =  new Color(1f, .8f, .8f);
+                }
+                else
+                {
+                    style.normal.textColor = Color.white;
+                    style.alignment = TextAnchor.MiddleCenter;
+                    style.fontSize = 24;
+                    style.fixedHeight = statusHeight;
+                }
+
+                GUILayout.Label(Instance.LoginStatus.Message, style);
+            }
+            GUILayout.EndArea();
+        }
 
     }
 }

@@ -49,9 +49,15 @@
      <Compile Include="Assets\Core\Logger.cs" />
      <Compile Include="Assets\Core\LoginOptions.cs" />
      <Compile Include="Assets\Core\Loom.cs" />
+     <Compile Include="Assets\Core\Region.cs" />
+     <Compile Include="Assets\Core\RegionTerrain.cs" />
+     <Compile Include="Assets\Core\SLCamera.cs" />
+     <Compile Include="Assets\Core\TerrainSplat.cs" />
      <Compile Include="Assets\GUI\GUIBase.cs" />
      <Compile Include="Assets\GUI\LoginScreen.cs" />
      <Compile Include="Assets\Main.cs" />
+     <None Include="Assets\Standard Assets\Skyboxes\_skybox info.txt" />
+     <None Include="Assets\Standard Assets\Water (Pro Only)\Sources\Shaders\FX-Water.shader" />
  <Reference Include="log4net">
  <HintPath>Assets\Assemblies\log4net.dll</HintPath>
  </Reference>
@@ -70,12 +76,22 @@
  <Reference Include="PrimMesher">
  <HintPath>Assets\Assemblies\PrimMesher.dll</HintPath>
  </Reference>
+ <Reference Include="System.Drawing">
+ <HintPath>Assets\Assemblies\System.Drawing.dll</HintPath>
+ </Reference>
  <Reference Include="XMLRPC">
  <HintPath>Assets\Assemblies\XMLRPC.dll</HintPath>
  </Reference>
  <Reference Include="zlib.net">
  <HintPath>Assets\Assemblies\zlib.net.dll</HintPath>
  </Reference>
+ <Reference Include="CSJ2K">
+ <HintPath>Assets\Assemblies\CSJ2K.dll</HintPath>
+ </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
+      <Project>{8E12794B-4B9C-8165-CBAB-E3E1DC08E928}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

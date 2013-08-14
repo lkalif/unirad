@@ -60,11 +60,13 @@ public class Loom : MonoBehaviour
         }
         else
         {
+            /*
             if (Thread.CurrentThread.ManagedThreadId == _mainThreadID)
             {
                 RunAction(action);
             }
-            else
+            
+            else*/
             {
                 lock (Current._actions)
                 {

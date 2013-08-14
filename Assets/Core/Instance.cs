@@ -9,6 +9,26 @@ public class Instance : MonoBehaviour
     [System.NonSerialized]
     public static readonly string AppName = "Radunity";
 
+    static Instance singleton = null;
+    public static Instance Singleton()
+    {
+        if (singleton != null)
+        {
+            return singleton;
+        }
+        else
+        {
+            var inst = (GameObject)GameObject.Find("Instance");
+            if (inst != null)
+            {
+                singleton = (Instance)inst.GetComponent<Instance>();
+                return singleton;
+            }
+
+        }
+        return null;
+    }
+
     OM.GridClient client;
     public OM.GridClient Client { get { return client; } }
 
@@ -38,9 +58,13 @@ public class Instance : MonoBehaviour
 
     [NonSerialized]
     public OM.LoginProgressEventArgs LoginStatus = new OM.LoginProgressEventArgs(OM.LoginStatus.None, string.Empty, string.Empty);
+    [NonSerialized]
+    public GameObject CurrentSim;
+
     LoginScreen login = null;
     OM.LoginStatus lastLoginStatus = OM.LoginStatus.None;
     State currentState;
+    SLCamera slCamera;
 
     void Start()
     {
@@ -52,6 +76,7 @@ public class Instance : MonoBehaviour
         InitializeClient(client);
 
         currentState = State.Login;
+        slCamera = Camera.main.GetComponent<SLCamera>();
     }
 
     void OnApplicationQuit()
@@ -67,7 +92,8 @@ public class Instance : MonoBehaviour
     {
         Login,
         LoggedIn,
-        Running
+        Running,
+        Test
     }
 
     // Update is called once per frame
@@ -105,6 +131,39 @@ public class Instance : MonoBehaviour
 
             case State.Running:
                 {
+                    client.Self.Movement.Camera.Far = 128f;
+                    client.Self.Movement.Camera.LookAt(
+                        client.Self.SimPosition + new OM.Vector3(-5, 0, 0) * client.Self.Movement.BodyRotation,
+                        client.Self.SimPosition
+                    );
+
+                    client.Self.Movement.AtPos = Input.GetAxis("Vertical") > 0;
+                    client.Self.Movement.AtNeg = Input.GetAxis("Vertical") < 0;
+                    
+                    float h = Input.GetAxis("Horizontal");
+                    if (Input.GetKey(KeyCode.LeftShift))
+                    {
+                        client.Self.Movement.LeftPos = h < 0;
+                        client.Self.Movement.LeftNeg = h > 0;
+                    }
+                    else
+                    {
+                        client.Self.Movement.TurnLeft = h < 0;
+                        client.Self.Movement.TurnRight = h > 0;
+                    }
+
+                    if (h != 0)
+                    {
+                        client.Self.Movement.BodyRotation = client.Self.Movement.BodyRotation * OM.Quaternion.CreateFromAxisAngle(OM.Vector3.UnitZ, -h * Time.deltaTime);
+                    }
+                    //client.Self.Movement.AtPos = true;
+                }
+                break;
+
+            case State.Test:
+                {
+                    Network_SimChanged(null, null);
+                    currentState = State.Running;
                 }
                 break;
         }
@@ -277,11 +336,69 @@ public class Instance : MonoBehaviour
     void RegisterClientEvents(OM.GridClient client)
     {
         client.Network.LoginProgress += new System.EventHandler<OM.LoginProgressEventArgs>(Network_LoginProgress);
+        client.Network.SimChanged += new EventHandler<OM.SimChangedEventArgs>(Network_SimChanged);
+        client.Terrain.LandPatchReceived += new EventHandler<OM.LandPatchReceivedEventArgs>(Terrain_LandPatchReceived);
+        client.Objects.ObjectUpdate += new EventHandler<OM.PrimEventArgs>(Objects_ObjectUpdate);
+        client.Objects.TerseObjectUpdate += new EventHandler<OM.TerseObjectUpdateEventArgs>(Objects_TerseObjectUpdate);
     }
 
     void UnregisterClientEvents(OM.GridClient client)
     {
         client.Network.LoginProgress -= new System.EventHandler<OM.LoginProgressEventArgs>(Network_LoginProgress);
+        client.Network.SimChanged -= new EventHandler<OM.SimChangedEventArgs>(Network_SimChanged);
+        client.Terrain.LandPatchReceived -= new EventHandler<OM.LandPatchReceivedEventArgs>(Terrain_LandPatchReceived);
+        client.Objects.ObjectUpdate -= new EventHandler<OM.PrimEventArgs>(Objects_ObjectUpdate);
+        client.Objects.TerseObjectUpdate -= new EventHandler<OM.TerseObjectUpdateEventArgs>(Objects_TerseObjectUpdate);
+    }
+
+    void Objects_TerseObjectUpdate(object sender, OM.TerseObjectUpdateEventArgs e)
+    {
+        ProcessObjectUpdate(e.Simulator, e.Prim);
+    }
+
+    void Objects_ObjectUpdate(object sender, OM.PrimEventArgs e)
+    {
+        ProcessObjectUpdate(e.Simulator, e.Prim);
+    }
+
+    void ProcessObjectUpdate(OM.Simulator sim, OM.Primitive prim)
+    {
+        Loom.QueueOnMainThread(() =>
+        {
+            if (prim.LocalID == client.Self.LocalID)
+            {
+                OM.Vector3 origPos = client.Self.SimPosition + new OM.Vector3(-5, 0, 3) * client.Self.Movement.BodyRotation;
+                Vector3 pos = new Vector3(origPos.X, origPos.Z, origPos.Y);
+                slCamera.target.position = pos;
+                slCamera.focalPoint = new Vector3(client.Self.SimPosition.X, client.Self.SimPosition.Z + 3, client.Self.SimPosition.Y);
+                slCamera.target.LookAt(slCamera.focalPoint);
+            }
+        });
+    }
+
+    void Terrain_LandPatchReceived(object sender, OM.LandPatchReceivedEventArgs e)
+    {
+        Loom.QueueOnMainThread(() =>
+        {
+            if (CurrentSim == null) return;
+            CurrentSim.GetComponent<Region>().Terrain.Modified = true;
+        });
+    }
+
+    void Network_SimChanged(object sender, OM.SimChangedEventArgs e)
+    {
+        Loom.QueueOnMainThread(() =>
+        {
+            if (CurrentSim != null)
+            {
+                Destroy(CurrentSim);
+            }
+            CurrentSim = new GameObject("Current Sim");
+            CurrentSim.transform.position = Vector3.zero;
+            CurrentSim.transform.rotation = Quaternion.identity;
+            var region = CurrentSim.AddComponent<Region>();
+            region.Sim = Client.Network.CurrentSim;
+        });
     }
 
     void Network_LoginProgress(object sender, OM.LoginProgressEventArgs e)
